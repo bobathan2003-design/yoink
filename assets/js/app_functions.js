@@ -3,6 +3,34 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxbGdwcGd1eGhxZWFvbmp6aW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjYwNDQsImV4cCI6MjA0ODIwMjA0NH0.4LuWk4qxp0NRZ5_erEIJq5BHq5qZiSE4zTUFS1ioZw8";
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+function getSiteBasePath() {
+  const scripts = Array.from(document.getElementsByTagName("script"));
+  const thisScript = scripts.find((script) =>
+    script.src.includes("/assets/js/app_functions.js")
+  );
+
+  if (thisScript) {
+    try {
+      const srcUrl = new URL(thisScript.src, window.location.origin);
+      const marker = "/assets/js/app_functions.js";
+      const markerIndex = srcUrl.pathname.indexOf(marker);
+      if (markerIndex >= 0) {
+        return srcUrl.pathname.slice(0, markerIndex);
+      }
+    } catch (_) {
+      // no-op
+    }
+  }
+
+  return "";
+}
+
+function withSiteBase(path) {
+  const base = getSiteBasePath();
+  if (!path.startsWith("/")) return `${base}/${path}`.replace(/\/+/g, "/");
+  return `${base}${path}` || path;
+}
+
 function getDescriptionFromMarkdown(markdown) {
   // markdown will come in like
   // ## Description
@@ -122,7 +150,7 @@ async function list_all_apps(element) {
     const a = document.createElement("a");
     a.id = appTitle;
     a.className = appCategory;
-    a.href = `/g4m3s/?title=${appTitle}`;
+    a.href = `${withSiteBase("/g4m3s/")}?title=${appTitle}`;
     const img = document.createElement("img");
     img.onmouseover = function () {
       viewFig(this);
@@ -206,7 +234,7 @@ function renderGameNotFound(message) {
             const picks = all.slice(0, 3);
             for (const rel of picks) {
               const a = document.createElement("a");
-              a.href = `/g4m3s/?title=${rel.title}`;
+              a.href = `${withSiteBase("/g4m3s/")}?title=${rel.title}`;
               const img = document.createElement("img");
               img.src = rel.icon;
               img.alt = rel.title;
@@ -388,7 +416,7 @@ async function hydrateAppPage() {
 
       for (const rel of finalList) {
         const a = document.createElement("a");
-        a.href = `/g4m3s/?title=${rel.title}`;
+        a.href = `${withSiteBase("/g4m3s/")}?title=${rel.title}`;
         const img = document.createElement("img");
         img.src = rel.icon;
         img.alt = rel.title;
