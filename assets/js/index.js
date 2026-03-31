@@ -1,4 +1,22 @@
 function getBasePathPrefix() {
+  const scripts = Array.from(document.getElementsByTagName("script"));
+  const thisScript = scripts.find((script) =>
+    script.src.includes("/assets/js/index.js")
+  );
+
+  if (thisScript) {
+    try {
+      const srcUrl = new URL(thisScript.src, window.location.origin);
+      const marker = "/assets/js/index.js";
+      const markerIndex = srcUrl.pathname.indexOf(marker);
+      if (markerIndex >= 0) {
+        return srcUrl.pathname.slice(0, markerIndex);
+      }
+    } catch (_) {
+      // no-op
+    }
+  }
+
   const { hostname, pathname } = window.location;
   if (hostname.endsWith(".github.io")) {
     const segments = pathname.split("/").filter(Boolean);
