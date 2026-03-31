@@ -32,45 +32,28 @@ function withSiteBase(path) {
 }
 
 function getDescriptionFromMarkdown(markdown) {
+  if (typeof markdown !== "string" || markdown.length === 0) {
+    return "";
+  }
   // markdown will come in like
   // ## Description
   // ****
   // ## Creator
   // so cut off the first two lines and return the rest
-  let built = markdown.split("## Description")[1];
-  built = built.split("## Creator")[0];
+  let built = markdown;
+  if (markdown.includes("## Description")) {
+    built = markdown.split("## Description")[1] || "";
+  }
+  if (built.includes("## Creator")) {
+    built = built.split("## Creator")[0] || built;
+  }
   return built.replaceAll("\n", "");
 }
 
 function create_in_article_ad() {
-  /**
-   * <div class="ad">
-          <ins
-            class="adsbygoogle"
-            style="display: block"
-            data-ad-client="ca-pub-8362959866002557"
-            data-ad-slot="8239998772"
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          ></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
-        </div>
-   */
   const adDiv = document.createElement("div");
   adDiv.className = "ad";
-  const ins = document.createElement("ins");
-  ins.className = "adsbygoogle";
-  ins.style.display = "block";
-  ins.setAttribute("data-ad-client", "ca-pub-8362959866002557");
-  ins.setAttribute("data-ad-slot", "8239998772");
-  ins.setAttribute("data-ad-format", "auto");
-  ins.setAttribute("data-full-width-responsive", "true");
-  const script = document.createElement("script");
-  script.innerHTML = "(adsbygoogle = window.adsbygoogle || []).push({});";
-  adDiv.appendChild(ins);
-  adDiv.appendChild(script);
+  adDiv.style.display = "none";
   return adDiv;
 }
 const APP_VER = "apps11";
@@ -167,10 +150,7 @@ async function list_all_apps(element) {
     a.appendChild(figcaption);
 
     element.appendChild(a);
-    if (i % 40 === 0 && i !== 0) {
-      const adDiv = create_in_article_ad();
-      element.appendChild(adDiv);
-    }
+    // ads intentionally disabled
   }
 }
 
